@@ -25,7 +25,7 @@ SET_BLUEFIRE:HandleEvent(EVENTS.Shot)
 --////FUNCTIONS
 
 local function FriendlyDownSound()
-	trigger.action.outSound('Oh Jesus.ogg')
+	--trigger.action.outSound('Oh Jesus.ogg')
 end
 
 function SET_RTREDBLUELAND:OnEventLand(EventData)
@@ -70,14 +70,14 @@ function SET_DEATHWATCH:OnEventCrash(EventData)
 		trigger.action.outText("A " .. CrashedUnitType .. " Has Been Destroyed!",15)
 		local RandomMigSound = math.random(1,2)
 		if (RandomMigSound == 1) then 
-			trigger.action.outSound('mig21splash-1.ogg')
+			--trigger.action.outSound('mig21splash-1.ogg')
 		else
-			trigger.action.outSound('mig21splash-2.ogg')
+			--trigger.action.outSound('mig21splash-2.ogg')
 		end		
 	elseif ( CrashedUnitCoalition == 1 and CrashedUnitType ~= 'MiG-21Bis' ) then		-- Enemy Non-MiG Down
 		trigger.action.outText("A " .. CrashedUnitType .. " Has Been Destroyed!",15)
 		local RandomAAKillSound = math.random(1,6)
-		trigger.action.outSound('AA Kill ' .. RandomAAKillSound .. '.ogg')				
+		--trigger.action.outSound('AA Kill ' .. RandomAAKillSound .. '.ogg')				
 	elseif ( CrashedUnitCoalition == 2 ) then 											-- Allied Plane Down
 		trigger.action.outText("A " .. CrashedUnitType .. " Has Been Destroyed!",15)
 		timer.scheduleFunction(FriendlyDownSound, {}, timer.getTime() + 1)		
@@ -118,7 +118,7 @@ function SET_BLUEFIRE:OnEventShot(EventData)
 													
 							if ( timer.getAbsTime() >= SoundLockout + 7 ) then
 								local RandomFox1Sound = math.random(1,2)
-								trigger.action.outSound('Fox1 ' .. RandomFox1Sound .. '.ogg')
+								--trigger.action.outSound('Fox1 ' .. RandomFox1Sound .. '.ogg')
 								SoundLockout = timer.getAbsTime()
 							else
 							end	
@@ -129,7 +129,7 @@ function SET_BLUEFIRE:OnEventShot(EventData)
 							
 							if ( timer.getAbsTime() >= SoundLockout + 7 ) then	
 								local RandomFox2Sound = math.random(1,3)
-								trigger.action.outSound('Fox2 ' .. RandomFox2Sound .. '.ogg')
+								--trigger.action.outSound('Fox2 ' .. RandomFox2Sound .. '.ogg')
 								SoundLockout = timer.getAbsTime()
 							else
 							end		
@@ -140,7 +140,7 @@ function SET_BLUEFIRE:OnEventShot(EventData)
 							
 							if ( timer.getAbsTime() >= SoundLockout + 7 ) then
 								local RandomFox3Sound = math.random(1,5)
-								trigger.action.outSound('FoxGeneric ' .. RandomFox3Sound .. '.ogg')
+								--trigger.action.outSound('FoxGeneric ' .. RandomFox3Sound .. '.ogg')
 								SoundLockout = timer.getAbsTime()
 							else
 							end							
@@ -171,7 +171,7 @@ function SET_BLUEFIRE:OnEventShot(EventData)
 						
 						if ( timer.getAbsTime() >= SoundLockout + 7 ) then
 							local RandomMagnumSound = math.random(1,1)
-							trigger.action.outSound('Magnum ' .. RandomMagnumSound .. '.ogg')
+							--trigger.action.outSound('Magnum ' .. RandomMagnumSound .. '.ogg')
 							SoundLockout = timer.getAbsTime()
 						else
 						end		
@@ -187,7 +187,7 @@ function SET_BLUEFIRE:OnEventShot(EventData)
 						
 						if ( timer.getAbsTime() >= SoundLockout + 7 ) then
 							local RandomRifleSound = math.random(1,1)
-							trigger.action.outSound('Rifle ' .. RandomRifleSound .. '.ogg')
+							--trigger.action.outSound('Rifle ' .. RandomRifleSound .. '.ogg')
 							SoundLockout = timer.getAbsTime()
 						else
 						end		
@@ -221,7 +221,7 @@ function SET_BLUEFIRE:OnEventShot(EventData)
 				
 				if ( timer.getAbsTime() >= SoundLockout + 7 ) then
 					local RandomPickleSound = math.random(1,5)
-					trigger.action.outSound('Pickle ' .. RandomPickleSound .. '.ogg')		
+					--trigger.action.outSound('Pickle ' .. RandomPickleSound .. '.ogg')		
 					SoundLockout = timer.getAbsTime()
 				else
 				end		
@@ -239,7 +239,7 @@ function SET_BLUEFIRE:OnEventShot(EventData)
 				
 				if ( timer.getAbsTime() >= SoundLockout + 7 ) then
 					local RandomSAMSound = math.random(1,6)
-					trigger.action.outSound('SAM ' .. RandomSAMSound .. '.ogg')			
+					--trigger.action.outSound('SAM ' .. RandomSAMSound .. '.ogg')			
 					SoundLockout = timer.getAbsTime()
 				else
 				end				
