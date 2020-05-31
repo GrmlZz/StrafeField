@@ -7,30 +7,21 @@
 --////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --////MISSION LOGIC FUNCTIONS
 
-function SEF_MissionSelector( TaskNumber )	
-
-	--DEBUG
-	trigger.action.outText("Called MissionSelector with TaskNumber "..TaskNumber, 5)
-	
-	if ( NumberOfCompletedMissions >= TotalScenarios ) then
-			
+function SEF_MissionSelector(TaskNumber)	
+	if (NumberOfCompletedMissions >= TotalScenarios) then			
 		OperationComplete = true
 		trigger.action.outText("Operation Clear Field Has Been Successful", 15)
-		--WRITE PROGRESS TABLES TO EMPTY AND SAVE WITH NO ARGUMENTS
 		ClearFieldUnitInterment = {}
 		SEF_SaveUnitIntermentTableNoArgs()
 		ClearFieldStaticInterment = {}
 		SEF_SaveStaticIntermentTableNoArgs()			
 	else
 		Randomiser = math.random(1,TotalScenarios)
-		if ( trigger.misc.getUserFlag(Randomiser) > 0 ) then
-			--SELECTED MISSION [Randomiser] ALREADY DONE, FLAG VALUE >=1, SELECT ANOTHER ONE
+		if (trigger.misc.getUserFlag(Randomiser) > 0) then
 			SEF_MissionSelector(TaskNumber)
-		elseif ( trigger.misc.getUserFlag(Randomiser) == 0 ) then
-			--SELECTED MISSION [Randomiser] IS AVAILABLE TO START, SET TO STARTED AND VALIDATE
+		elseif (trigger.misc.getUserFlag(Randomiser) == 0) then
 			trigger.action.setUserFlag(Randomiser,1)
 			SEF_RetrieveMissionInformation(Randomiser, TaskNumber)
-			--trigger.action.outText("Validating Mission Number "..Randomiser.." For Targeting", 15)
 			SEF_ValidateMission(TaskNumber)										
 		else
 			trigger.action.outText("Mission Selection Error", 15)
@@ -38,62 +29,46 @@ function SEF_MissionSelector( TaskNumber )
 	end		
 end
 
-function SEF_RetrieveMissionInformation ( MissionNumber, TaskNumber )
-
-	--DEBUG
-	--trigger.action.outText("Called RetrieveMissionInformation with Missionnumber"..MissionNumber.." and TaskNumber "..TaskNumber, 5)
-	
-	--SET GLOBAL VARIABLES TO THE SELECTED MISSION
+function SEF_RetrieveMissionInformation (MissionNumber, TaskNumber)
 	if (TaskNumber == 1) then
 		ScenarioNumber = MissionNumber
 		AGMissionTarget = OperationClearField_AG[MissionNumber].TargetName
 		AGTargetTypeStatic = OperationClearField_AG[MissionNumber].TargetStatic
-		AGMissionBriefingText = OperationClearField_AG[MissionNumber].TargetBriefing		
+		AGMissionBriefingText = OperationClearField_AG[MissionNumber].TargetBriefing
     elseif (TaskNumber == 2) then
 		Scenario2Number = MissionNumber
 		AGMission2Target = OperationClearField_AG[MissionNumber].TargetName
 		AGTarget2TypeStatic = OperationClearField_AG[MissionNumber].TargetStatic
-		AGMission2BriefingText = OperationClearField_AG[MissionNumber].TargetBriefing	
+		AGMission2BriefingText = OperationClearField_AG[MissionNumber].TargetBriefing
     elseif (TaskNumber == 3) then
 		Scenario3Number = MissionNumber
 		AGMission3Target = OperationClearField_AG[MissionNumber].TargetName
 		AGTarget3TypeStatic = OperationClearField_AG[MissionNumber].TargetStatic
-		AGMission3BriefingText = OperationClearField_AG[MissionNumber].TargetBriefing	
+		AGMission3BriefingText = OperationClearField_AG[MissionNumber].TargetBriefing
 	end
 end
 
-function SEF_ValidateMission(TaskNumber)
-
-	--DEBUG
-	--trigger.action.outText("Called ValidateMission with TaskNumber "..TaskNumber, 5)
-	
+function SEF_ValidateMission(TaskNumber)	
 	if (TaskNumber == 1) then
-		--CHECK TARGET TO SEE IF IT IS ALIVE OR NOT
-		if ( AGTargetTypeStatic == false and AGMissionTarget ~= nil ) then
-			--TARGET IS NOT STATIC					
-			if ( GROUP:FindByName(AGMissionTarget):IsAlive() == true ) then
-				--GROUP VALID
+		if (AGTargetTypeStatic == false and AGMissionTarget ~= nil) then
+			if (GROUP:FindByName(AGMissionTarget):IsAlive() == true) then
 				trigger.action.outSound('That Is Our Target.ogg')
-				trigger.action.outText(AGMissionBriefingText,15)			
-			elseif ( GROUP:FindByName(AGMissionTarget):IsAlive() == false or GROUP:FindByName(AGMissionTarget):IsAlive() == nil ) then
-				--GROUP NOT VALID
-				trigger.action.setUserFlag(ScenarioNumber,4)
+				trigger.action.outText(AGMissionBriefingText, 15)			
+			elseif (GROUP:FindByName(AGMissionTarget):IsAlive() == false or GROUP:FindByName(AGMissionTarget):IsAlive() == nil) then
+				trigger.action.setUserFlag(ScenarioNumber, 4)
 				NumberOfCompletedMissions = NumberOfCompletedMissions + 1
 				AGMissionTarget = nil
 				AGMissionBriefingText = nil
 				SEF_MissionSelector(TaskNumber)						
 			else			
-				trigger.action.outText("Mission Validation Error - Unexpected Result In Group Size", 15)						
+				trigger.action.outText("Mission Validation Error - Unexpected Result In Group Size", 15)
 			end		
-		elseif ( AGTargetTypeStatic == true and AGMissionTarget ~= nil ) then		
-			--TARGET IS STATIC		
-			if ( StaticObject.getByName(AGMissionTarget) ~= nil and StaticObject.getByName(AGMissionTarget):isExist() == true ) then
-				--STATIC IS VALID
+		elseif (AGTargetTypeStatic == true and AGMissionTarget ~= nil) then
+			if (StaticObject.getByName(AGMissionTarget) ~= nil and StaticObject.getByName(AGMissionTarget):isExist() == true) then
 				trigger.action.outSound('That Is Our Target.ogg')
-				trigger.action.outText(AGMissionBriefingText,15)								
-			elseif ( StaticObject.getByName(AGMissionTarget) == nil or StaticObject.getByName(AGMissionTarget):isExist() == false ) then													
-				--STATIC TARGET NOT VALID, ASSUME TARGET ALREADY DESTROYED			
-				trigger.action.setUserFlag(ScenarioNumber,4)
+				trigger.action.outText(AGMissionBriefingText, 15)								
+			elseif ( StaticObject.getByName(AGMissionTarget) == nil or StaticObject.getByName(AGMissionTarget):isExist() == false ) then
+				trigger.action.setUserFlag(ScenarioNumber, 4)
 				NumberOfCompletedMissions = NumberOfCompletedMissions + 1	
 				AGMissionTarget = nil
 				AGMissionBriefingText = nil
@@ -101,23 +76,19 @@ function SEF_ValidateMission(TaskNumber)
 			else
 				trigger.action.outText("Mission Validation Error - Unexpected Result In Static Test", 15)	
 			end		
-		elseif ( OperationComplete == true ) then
+		elseif (OperationComplete == true) then
 			trigger.action.outText("The Operation Is Complete - No Further Targets To Validate For Mission Assignment", 15)
 		else		
 			trigger.action.outText("Mission Validation Error - Mission Validation Unavailable, No Valid Targets", 15)
 		end
 	
 	elseif (TaskNumber == 2) then
-		 --CHECK TARGET TO SEE IF IT IS ALIVE OR NOT
-		if ( AGTarget2TypeStatic == false and AGMission2Target ~= nil ) then
-			--TARGET IS NOT STATIC					
-			if ( GROUP:FindByName(AGMission2Target):IsAlive() == true ) then
-				--GROUP VALID
+		if (AGTarget2TypeStatic == false and AGMission2Target ~= nil ) then
+			if (GROUP:FindByName(AGMission2Target):IsAlive() == true ) then
 				trigger.action.outSound('That Is Our Target.ogg')
-				trigger.action.outText(AGMission2BriefingText,15)			
-			elseif ( GROUP:FindByName(AGMission2Target):IsAlive() == false or GROUP:FindByName(AGMission2Target):IsAlive() == nil ) then
-				--GROUP NOT VALID
-				trigger.action.setUserFlag(Scenario2Number,4)
+				trigger.action.outText(AGMission2BriefingText, 15)			
+			elseif (GROUP:FindByName(AGMission2Target):IsAlive() == false or GROUP:FindByName(AGMission2Target):IsAlive() == nil) then
+				trigger.action.setUserFlag(Scenario2Number, 4)
 				NumberOfCompletedMissions = NumberOfCompletedMissions + 1
 				AGMission2Target = nil
 				AGMission2BriefingText = nil
@@ -125,15 +96,12 @@ function SEF_ValidateMission(TaskNumber)
 			else			
 				trigger.action.outText("Mission Validation Error - Unexpected Result In Group Size", 15)						
 			end		
-		elseif ( AGTarget2TypeStatic == true and AGMission2Target ~= nil ) then		
-			--TARGET IS STATIC		
-			if ( StaticObject.getByName(AGMission2Target) ~= nil and StaticObject.getByName(AGMission2Target):isExist() == true ) then
-				--STATIC IS VALID
+		elseif (AGTarget2TypeStatic == true and AGMission2Target ~= nil) then
+			if (StaticObject.getByName(AGMission2Target) ~= nil and StaticObject.getByName(AGMission2Target):isExist() == true) then
 				trigger.action.outSound('That Is Our Target.ogg')
-				trigger.action.outText(AGMission2BriefingText,15)								
-			elseif ( StaticObject.getByName(AGMission2Target) == nil or StaticObject.getByName(AGMission2Target):isExist() == false ) then													
-				--STATIC TARGET NOT VALID, ASSUME TARGET ALREADY DESTROYED			
-				trigger.action.setUserFlag(Scenario2Number,4)
+				trigger.action.outText(AGMission2BriefingText, 15)								
+			elseif (StaticObject.getByName(AGMission2Target) == nil or StaticObject.getByName(AGMission2Target):isExist() == false) then
+				trigger.action.setUserFlag(Scenario2Number, 4)
 				NumberOfCompletedMissions = NumberOfCompletedMissions + 1	
 				AGMission2Target = nil
 				AGMission2BriefingText = nil
@@ -141,22 +109,19 @@ function SEF_ValidateMission(TaskNumber)
 			else
 				trigger.action.outText("Mission Validation Error - Unexpected Result In Static Test", 15)	
 			end		
-		elseif ( OperationComplete == true ) then
+		elseif (OperationComplete == true) then
 			trigger.action.outText("The Operation Is Complete - No Further Targets To Validate For Mission Assignment", 15)
 		else		
 			trigger.action.outText("Mission Validation Error - Mission Validation Unavailable, No Valid Targets", 15)
 		end
 	elseif (TaskNumber == 3) then
-		 --CHECK TARGET TO SEE IF IT IS ALIVE OR NOT
-		if ( AGTarget3TypeStatic == false and AGMission3Target ~= nil ) then
-			--TARGET IS NOT STATIC					
-			if ( GROUP:FindByName(AGMission3Target):IsAlive() == true ) then
-				--GROUP VALID
+		if (AGTarget3TypeStatic == false and AGMission3Target ~= nil) then
+			if (GROUP:FindByName(AGMission3Target):IsAlive() == true) then
 				trigger.action.outSound('That Is Our Target.ogg')
-				trigger.action.outText(AGMission3BriefingText,15)			
-			elseif ( GROUP:FindByName(AGMission3Target):IsAlive() == false or GROUP:FindByName(AGMission3Target):IsAlive() == nil ) then
+				trigger.action.outText(AGMission3BriefingText, 15)			
+			elseif (GROUP:FindByName(AGMission3Target):IsAlive() == false or GROUP:FindByName(AGMission3Target):IsAlive() == nil) then
 				--GROUP NOT VALID
-				trigger.action.setUserFlag(Scenario3Number,4)
+				trigger.action.setUserFlag(Scenario3Number, 4)
 				NumberOfCompletedMissions = NumberOfCompletedMissions + 1
 				AGMission3Target = nil
 				AGMission3BriefingText = nil
@@ -164,15 +129,12 @@ function SEF_ValidateMission(TaskNumber)
 			else			
 				trigger.action.outText("Mission Validation Error - Unexpected Result In Group Size", 15)						
 			end		
-		elseif ( AGTarget3TypeStatic == true and AGMission3Target ~= nil ) then		
-			--TARGET IS STATIC		
-			if ( StaticObject.getByName(AGMission3Target) ~= nil and StaticObject.getByName(AGMission3Target):isExist() == true ) then
-				--STATIC IS VALID
+		elseif (AGTarget3TypeStatic == true and AGMission3Target ~= nil) then
+			if (StaticObject.getByName(AGMission3Target) ~= nil and StaticObject.getByName(AGMission3Target):isExist() == true) then
 				trigger.action.outSound('That Is Our Target.ogg')
-				trigger.action.outText(AGMission3BriefingText,15)								
-			elseif ( StaticObject.getByName(AGMission3Target) == nil or StaticObject.getByName(AGMission3Target):isExist() == false ) then													
-				--STATIC TARGET NOT VALID, ASSUME TARGET ALREADY DESTROYED			
-				trigger.action.setUserFlag(Scenario3Number,4)
+				trigger.action.outText(AGMission3BriefingText, 15)								
+			elseif (StaticObject.getByName(AGMission3Target) == nil or StaticObject.getByName(AGMission3Target):isExist() == false) then
+				trigger.action.setUserFlag(Scenario3Number, 4)
 				NumberOfCompletedMissions = NumberOfCompletedMissions + 1	
 				AGMission3Target = nil
 				AGMission3BriefingText = nil
@@ -180,7 +142,7 @@ function SEF_ValidateMission(TaskNumber)
 			else
 				trigger.action.outText("Mission Validation Error - Unexpected Result In Static Test", 15)	
 			end		
-		elseif ( OperationComplete == true ) then
+		elseif (OperationComplete == true) then
 			trigger.action.outText("The Operation Is Complete - No Further Targets To Validate For Mission Assignment", 15)
 		else		
 			trigger.action.outText("Mission Validation Error - Mission Validation Unavailable, No Valid Targets", 15)
@@ -188,30 +150,26 @@ function SEF_ValidateMission(TaskNumber)
 	end
 end
 
-function SEF_SkipMission1()	
-	--CHECK MISSION IS NOT SUDDENLY FLAGGED AS STATE 4 (COMPLETED)
+function SEF_SkipMission1()
 	if ( trigger.misc.getUserFlag(ScenarioNumber) >= 1 and trigger.misc.getUserFlag(ScenarioNumber) <= 3 ) then
-		--RESET MISSION TO STATE 0 (NOT STARTED), CLEAR TARGET INFORMATION AND REROLL A NEW MISSION
-		trigger.action.setUserFlag(ScenarioNumber,0) 
+		trigger.action.setUserFlag(ScenarioNumber, 0) 
 		AGMissionTarget = nil
 		AGMissionBriefingText = nil
 		SEF_MissionSelector(1)
-	elseif ( OperationComplete == true ) then
+	elseif (OperationComplete == true) then
 		trigger.action.outText("The Operation Has Been Completed, All Objectives Have Been Met", 15)
 	else		
 		trigger.action.outText("Unable To Skip As Current Mission Is In A Completion State", 15)
 	end
 end
 
-function SEF_SkipMission2()	
-	--CHECK MISSION IS NOT SUDDENLY FLAGGED AS STATE 4 (COMPLETED)
-	if ( trigger.misc.getUserFlag(Scenario2Number) >= 1 and trigger.misc.getUserFlag(Scenario2Number) <= 3 ) then
-		--RESET MISSION TO STATE 0 (NOT STARTED), CLEAR TARGET INFORMATION AND REROLL A NEW MISSION
-		trigger.action.setUserFlag(Scenario2Number,0) 
+function SEF_SkipMission2()
+	if (trigger.misc.getUserFlag(Scenario2Number) >= 1 and trigger.misc.getUserFlag(Scenario2Number) <= 3) then
+		trigger.action.setUserFlag(Scenario2Number, 0) 
 		AGMission2Target = nil
 		AGMission2BriefingText = nil
 		SEF_MissionSelector(2)
-	elseif ( OperationComplete == true ) then
+	elseif (OperationComplete == true) then
 		trigger.action.outText("The Operation Has Been Completed, All Objectives Have Been Met", 15)
 	else		
 		trigger.action.outText("Unable To Skip As Current Mission Is In A Completion State", 15)
@@ -219,14 +177,12 @@ function SEF_SkipMission2()
 end
 
 function SEF_SkipMission3()	
-	--CHECK MISSION IS NOT SUDDENLY FLAGGED AS STATE 4 (COMPLETED)
-	if ( trigger.misc.getUserFlag(Scenario3Number) >= 1 and trigger.misc.getUserFlag(Scenario3Number) <= 3 ) then
-		--RESET MISSION TO STATE 0 (NOT STARTED), CLEAR TARGET INFORMATION AND REROLL A NEW MISSION
-		trigger.action.setUserFlag(Scenario3Number,0) 
+	if (trigger.misc.getUserFlag(Scenario3Number) >= 1 and trigger.misc.getUserFlag(Scenario3Number) <= 3) then
+		trigger.action.setUserFlag(Scenario3Number, 0) 
 		AGMission3Target = nil
 		AGMission3BriefingText = nil
 		SEF_MissionSelector(3)
-	elseif ( OperationComplete == true ) then
+	elseif (OperationComplete == true) then
 		trigger.action.outText("The Operation Has Been Completed, All Objectives Have Been Met", 15)
 	else		
 		trigger.action.outText("Unable To Skip As Current Mission Is In A Completion State", 15)
@@ -234,13 +190,8 @@ function SEF_SkipMission3()
 end
 
 
-function MissionSuccess(TaskNumber)
-
-	--DEBUG
-	trigger.action.outText("Called MissionSuccess with TaskNumber "..TaskNumber, 5)
-	
+function MissionSuccess(TaskNumber)	
 	if (TaskNumber == 1) then
-		--SET GLOBALS TO NIL
 		AGMissionTarget = nil
 		AGMissionBriefingText = nil
 	elseif (TaskNumber == 2) then
@@ -251,25 +202,16 @@ function MissionSuccess(TaskNumber)
 		AGMission3BriefingText = nil
 	end
 	
-	local RandomMissionSuccessSound = math.random(1,5)
-	trigger.action.outSound('AG Kill ' .. RandomMissionSuccessSound .. '.ogg')	
+	local RandomMissionSuccessSound = math.random(1, 5)
 end
 
 function SEF_Mission1TargetStatus(TimeLoop, time)
-    --DEBUG
-	--trigger.action.outText("Called Mission1TargetStatus", 5)
-
-	if (AGTargetTypeStatic == false and AGMissionTarget ~= nil) then
-		--TARGET IS NOT STATIC
-					
+	if (AGTargetTypeStatic == false and AGMissionTarget ~= nil) then					
 		if (GROUP:FindByName(AGMissionTarget):IsAlive() == true) then
-			--GROUP STILL ALIVE
-			return time + 10			
-
-		elseif (GROUP:FindByName(AGMissionTarget):IsAlive() == false or GROUP:FindByName(AGMissionTarget):IsAlive() == nil) then 
-			--GROUP DEAD
+			return time + 10
+		elseif (GROUP:FindByName(AGMissionTarget):IsAlive() == false or GROUP:FindByName(AGMissionTarget):IsAlive() == nil) then
 			trigger.action.outText("Mission Update - Mission Successful", 15)
-			trigger.action.setUserFlag(ScenarioNumber,4)
+			trigger.action.setUserFlag(ScenarioNumber, 4)
 			NumberOfCompletedMissions = NumberOfCompletedMissions + 1
 			MissionSuccess(1)
 			timer.scheduleFunction(SEF_MissionSelector, 1, timer.getTime() + 20)
@@ -279,14 +221,11 @@ function SEF_Mission1TargetStatus(TimeLoop, time)
 			trigger.action.outText("Mission Target Status - Unexpected Result, Monitor Has Stopped", 15)						
 		end		
 	elseif (AGTargetTypeStatic == true and AGMissionTarget ~= nil) then
-		--TARGET IS STATIC
-		if ( StaticObject.getByName(AGMissionTarget) ~= nil and StaticObject.getByName(AGMissionTarget):isExist() == true ) then
-			--STATIC ALIVE
+		if (StaticObject.getByName(AGMissionTarget) ~= nil and StaticObject.getByName(AGMissionTarget):isExist() == true) then
 			return time + 10				
-		else				
-			--STATIC DESTROYED
+		else
 			trigger.action.outText("Mission Update - Mission Successful", 15)
-			trigger.action.setUserFlag(ScenarioNumber,4)
+			trigger.action.setUserFlag(ScenarioNumber, 4)
 			NumberOfCompletedMissions = NumberOfCompletedMissions + 1
 			MissionSuccess(1)
 			timer.scheduleFunction(SEF_MissionSelector, 1, timer.getTime() + 20)
@@ -299,23 +238,13 @@ function SEF_Mission1TargetStatus(TimeLoop, time)
 end
 
 
-function SEF_Mission2TargetStatus(TimeLoop, time)
-	--DEBUG
-	--trigger.action.outText("Called Mission2TargetStatus", 5)
-	
+function SEF_Mission2TargetStatus(TimeLoop, time)	
 	if (AGTarget2TypeStatic == false and AGMission2Target ~= nil) then
-		--TARGET IS NOT STATIC
-					
 		if (GROUP:FindByName(AGMission2Target):IsAlive() == true) then
-			--GROUP STILL ALIVE
-			--DEBUG 
-			--trigger.action.outText("Target still alive", 5)
-			return time + 10			
-
-		elseif (GROUP:FindByName(AGMission2Target):IsAlive() == false or GROUP:FindByName(AGMission2Target):IsAlive() == nil) then 
-			--GROUP DEAD
+			return time + 10
+		elseif (GROUP:FindByName(AGMission2Target):IsAlive() == false or GROUP:FindByName(AGMission2Target):IsAlive() == nil) then
 			trigger.action.outText("Mission Update - Mission Successful", 15)
-			trigger.action.setUserFlag(Scenario2Number,4)
+			trigger.action.setUserFlag(Scenario2Number, 4)
 			NumberOfCompletedMissions = NumberOfCompletedMissions + 1
 			MissionSuccess(2)
 			timer.scheduleFunction(SEF_MissionSelector, 2, timer.getTime() + 20)
@@ -325,16 +254,11 @@ function SEF_Mission2TargetStatus(TimeLoop, time)
 			trigger.action.outText("Mission Target Status - Unexpected Result, Monitor Has Stopped", 15)						
 		end		
 	elseif (AGTarget2TypeStatic == true and AGMission2Target ~= nil) then
-		--TARGET IS STATIC
-		if ( StaticObject.getByName(AGMission2Target) ~= nil and StaticObject.getByName(AGMission2Target):isExist() == true ) then
-			--STATIC ALIVE
-			--DEBUG 
-			trigger.action.outText("Target still alive (static)", 5)
+		if (StaticObject.getByName(AGMission2Target) ~= nil and StaticObject.getByName(AGMission2Target):isExist() == true) then
 			return time + 10				
-		else				
-			--STATIC DESTROYED
+		else
 			trigger.action.outText("Mission Update - Mission Successful", 15)
-			trigger.action.setUserFlag(Scenario2Number,4)
+			trigger.action.setUserFlag(Scenario2Number, 4)
 			NumberOfCompletedMissions = NumberOfCompletedMissions + 1
 			MissionSuccess(2)
 			timer.scheduleFunction(SEF_MissionSelector, 2, timer.getTime() + 20)
@@ -342,26 +266,16 @@ function SEF_Mission2TargetStatus(TimeLoop, time)
 			return time + 30				
 		end		
 	else
-		--DEBUG 
-		trigger.action.outText("Do Nothing", 5)
 		return time + 10
 	end	
 end
 
 
 function SEF_Mission3TargetStatus(TimeLoop, time)
-	--DEBUG
-	--trigger.action.outText("Called Mission3TargetStatus", 5)
-
 	if (AGTarget3TypeStatic == false and AGMission3Target ~= nil) then
-		--TARGET IS NOT STATIC
-					
 		if (GROUP:FindByName(AGMission3Target):IsAlive() == true) then
-			--GROUP STILL ALIVE
-			return time + 10			
-
+			return time + 10
 		elseif (GROUP:FindByName(AGMission3Target):IsAlive() == false or GROUP:FindByName(AGMission3Target):IsAlive() == nil) then 
-			--GROUP DEAD
 			trigger.action.outText("Mission Update - Mission Successful", 15)
 			trigger.action.setUserFlag(Scenario3Number,4)
 			NumberOfCompletedMissions = NumberOfCompletedMissions + 1
@@ -373,12 +287,9 @@ function SEF_Mission3TargetStatus(TimeLoop, time)
 			trigger.action.outText("Mission Target Status - Unexpected Result, Monitor Has Stopped", 15)						
 		end		
 	elseif (AGTarget3TypeStatic == true and AGMission2Target ~= nil) then
-		--TARGET IS STATIC
-		if ( StaticObject.getByName(AGMission3Target) ~= nil and StaticObject.getByName(AGMission3Target):isExist() == true ) then
-			--STATIC ALIVE
+		if (StaticObject.getByName(AGMission3Target) ~= nil and StaticObject.getByName(AGMission3Target):isExist() == true) then
 			return time + 10				
-		else				
-			--STATIC DESTROYED
+		else
 			trigger.action.outText("Mission Update - Mission Successful", 15)
 			trigger.action.setUserFlag(Scenario3Number,4)
 			NumberOfCompletedMissions = NumberOfCompletedMissions + 1
@@ -395,11 +306,9 @@ end
 --////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --////MISSION TARGET TABLE
 
-function SEF_InitializeMissionTable()
-	
+function SEF_InitializeMissionTable()	
 	OperationClearField_AG = {}
 	
-	--KVEMO-ROKA
 	OperationClearField_AG[1] = {
 		TargetName = "Kvemo Roka - AAA 1",
 		TargetStatic = false,
@@ -1038,20 +947,7 @@ function SEF_InitializeMissionTable()
 		TargetName = "Zugdidi - Armor 4",
 		TargetStatic = false,
 		TargetBriefing = "Primary Objective - Destroy the IFV's at the Military Barracks located at Gali\nZugdidi Sector - Grid GH22",
-	}	
-	
-	--Debug Code
-	--[[
-	trigger.action.outText("Target 1 Name: "..OperationClearField_AG[1].TargetName, 15)
-	trigger.action.outText("Target 1 Type: "..OperationClearField_AG[1].TargetType, 15)
-	trigger.action.outText(OperationClearField_AG[1].TargetBriefing, 15)
-	
-	OperationClearField_AG[1] = {}
-	OperationClearField_AG[1][1] = "Test Sector - Supply 1"
-	OperationClearField_AG[1][2] = "Unit"
-	trigger.action.outText("Target 1 Name: "..OperationClearField_AG[1][1], 15)
-	trigger.action.outText("Target 1 Type: "..OperationClearField_AG[1][2], 15)
-	]]--
+	}
 end
 
 --////End Mission Target Table
@@ -1060,40 +956,35 @@ end
 
 local function CheckObjectiveRequest()
 	
-	if ( AGMissionBriefingText ~= nil ) then
+	if (AGMissionBriefingText ~= nil) then
 		trigger.action.outText(AGMissionBriefingText, 15)
 	end
 
-	if ( AGMission2BriefingText ~= nil ) then
+	if (AGMission2BriefingText ~= nil) then
 		trigger.action.outText(AGMission2BriefingText, 15)
 	end
 
-	if ( AGMission3BriefingText ~= nil ) then
+	if (AGMission3BriefingText ~= nil) then
 		trigger.action.outText(AGMission3BriefingText, 15)
 	end
 
 
-	if ( OperationComplete == true ) then
+	if (OperationComplete == true) then
 		trigger.action.outText("The Operation Has Been Completed, There Are No Further Objectives", 15)
 	end
 
 
-	if ( (AGMissionBriefingText == nil and AGMission2BriefingText == nil and AGMission3BriefingText == nil ) and OperationComplete == false ) then
+	if ((AGMissionBriefingText == nil and AGMission2BriefingText == nil and AGMission3BriefingText == nil) and OperationComplete == false) then
 		trigger.action.outText("Check Objective Request Error - No Briefing Available And Operation Is Not Completed", 15)
 	end	
 end
 
-function Target1Report()
-			
-	if (AGTargetTypeStatic == false and AGMissionTarget ~=nil) then
-		TargetGroup = GROUP:FindByName(AGMissionTarget)	
-		
+function Target1Report()			
+	if (AGTargetTypeStatic == false and AGMissionTarget ~= nil) then
+		TargetGroup = GROUP:FindByName(AGMissionTarget)
 		if (GROUP:FindByName(AGMissionTarget):IsAlive() == true) then
-		
-			TargetRemainingUnits = Group.getByName(AGMissionTarget):getSize()	
-			
+			TargetRemainingUnits = Group.getByName(AGMissionTarget):getSize()
 			MissionPlayersBlue = SET_CLIENT:New():FilterCoalitions("blue"):FilterActive():FilterOnce()
-			
 			MissionPlayersBlue:ForEachClient(
 				function(Client)
 					if Client:IsAlive() == true then
@@ -1115,8 +1006,7 @@ function Target1Report()
 						TargetBearing = PlayerCoord:GetAngleRadians (TargetVector)	
 					
 						PlayerBR = PlayerCoord:GetBRText(TargetBearing, PlayerDistance, SETTINGS:SetImperial())
-					
-						--List the amount of units remaining in the group
+						
 						if (TargetRemainingUnits > 1) then
 							SZMessage = "There are "..TargetRemainingUnits.." targets remaining for this mission" 
 						elseif (TargetRemainingUnits == 1) then
@@ -1152,11 +1042,9 @@ function Target1Report()
 			trigger.action.outText("Target Report Unavailable", 15)
 		end
 		
-	elseif (AGTargetTypeStatic == true and AGMissionTarget ~=nil) then
-		TargetGroup = STATIC:FindByName(AGMissionTarget, false)
-		
+	elseif (AGTargetTypeStatic == true and AGMissionTarget ~= nil) then
+		TargetGroup = STATIC:FindByName(AGMissionTarget, false)		
 		MissionPlayersBlue = SET_CLIENT:New():FilterCoalitions("blue"):FilterActive():FilterOnce()
-
 		MissionPlayersBlue:ForEachClient(
 			function(Client)
 				if Client:IsAlive() == true then
@@ -1210,7 +1098,7 @@ end
 
 function Target2Report()
 			
-	if (AGTarget2TypeStatic == false and AGMission2Target ~=nil) then
+	if (AGTarget2TypeStatic == false and AGMission2Target ~= nil) then
 		TargetGroup = GROUP:FindByName(AGMission2Target)	
 		
 		if (GROUP:FindByName(AGMission2Target):IsAlive() == true) then
@@ -1240,8 +1128,7 @@ function Target2Report()
 						TargetBearing = PlayerCoord:GetAngleRadians (TargetVector)	
 					
 						PlayerBR = PlayerCoord:GetBRText(TargetBearing, PlayerDistance, SETTINGS:SetImperial())
-					
-						--List the amount of units remaining in the group
+						
 						if (TargetRemainingUnits > 1) then
 							SZMessage = "There are "..TargetRemainingUnits.." targets remaining for this mission" 
 						elseif (TargetRemainingUnits == 1) then
@@ -1277,11 +1164,9 @@ function Target2Report()
 			trigger.action.outText("Target Report Unavailable", 15)
 		end
 		
-	elseif (AGTargetTypeStatic == true and AGMissionTarget ~=nil) then
-		TargetGroup = STATIC:FindByName(AGMissionTarget, false)
-		
+	elseif (AGTarget2TypeStatic == true and AGMission2Target ~= nil) then
+		TargetGroup = STATIC:FindByName(AGMission2Target, false)		
 		MissionPlayersBlue = SET_CLIENT:New():FilterCoalitions("blue"):FilterActive():FilterOnce()
-
 		MissionPlayersBlue:ForEachClient(
 			function(Client)
 				if Client:IsAlive() == true then
@@ -1325,7 +1210,7 @@ function Target2Report()
 				end				
 			end
 		)		
-	elseif ( OperationComplete == true ) then
+	elseif (OperationComplete == true) then
 		trigger.action.outText("The Operation Has Been Completed, There Are No Further Targets", 15)	
 	else
 		trigger.action.outText("No Target Information Available", 15)
@@ -1333,17 +1218,12 @@ function Target2Report()
 end
 
 
-function Target3Report()
-			
-	if (AGTarget3TypeStatic == false and AGMission3Target ~=nil) then
-		TargetGroup = GROUP:FindByName(AGMission3Target)	
-		
-		if (GROUP:FindByName(AGMission3Target):IsAlive() == true) then
-		
-			TargetRemainingUnits = Group.getByName(AGMission3Target):getSize()	
-			
-			MissionPlayersBlue = SET_CLIENT:New():FilterCoalitions("blue"):FilterActive():FilterOnce()
-			
+function Target3Report()			
+	if (AGTarget3TypeStatic == false and AGMission3Target ~= nil) then
+		TargetGroup = GROUP:FindByName(AGMission3Target)		
+		if (GROUP:FindByName(AGMission3Target):IsAlive() == true) then		
+			TargetRemainingUnits = Group.getByName(AGMission3Target):getSize()			
+			MissionPlayersBlue = SET_CLIENT:New():FilterCoalitions("blue"):FilterActive():FilterOnce()			
 			MissionPlayersBlue:ForEachClient(
 				function(Client)
 					if Client:IsAlive() == true then
@@ -1365,8 +1245,7 @@ function Target3Report()
 						TargetBearing = PlayerCoord:GetAngleRadians (TargetVector)	
 					
 						PlayerBR = PlayerCoord:GetBRText(TargetBearing, PlayerDistance, SETTINGS:SetImperial())
-					
-						--List the amount of units remaining in the group
+						
 						if (TargetRemainingUnits > 1) then
 							SZMessage = "There are "..TargetRemainingUnits.." targets remaining for this mission" 
 						elseif (TargetRemainingUnits == 1) then
@@ -1402,11 +1281,9 @@ function Target3Report()
 			trigger.action.outText("Target Report Unavailable", 15)
 		end
 		
-	elseif (AGTargetTypeStatic == true and AGMissionTarget ~=nil) then
-		TargetGroup = STATIC:FindByName(AGMissionTarget, false)
-		
+	elseif (AGTarget3TypeStatic == true and AGMission3Target ~= nil) then
+		TargetGroup = STATIC:FindByName(AGMission3Target, false)		
 		MissionPlayersBlue = SET_CLIENT:New():FilterCoalitions("blue"):FilterActive():FilterOnce()
-
 		MissionPlayersBlue:ForEachClient(
 			function(Client)
 				if Client:IsAlive() == true then
@@ -1450,7 +1327,7 @@ function Target3Report()
 				end				
 			end
 		)		
-	elseif ( OperationComplete == true ) then
+	elseif (OperationComplete == true) then
 		trigger.action.outText("The Operation Has Been Completed, There Are No Further Targets", 15)	
 	else
 		trigger.action.outText("No Target Information Available", 15)
@@ -1493,36 +1370,29 @@ Flags
 ]]--
 
 --////COMBAT AIR PATROL FIGHTER SCREEN
-function RequestFighterSupport(CAPSector)
-	
-	if ( trigger.misc.getUserFlag(5001) == 1 ) then	
-		if ( trigger.misc.getUserFlag(5010) == 0 ) then
-			
-			local RouteNumber = CAPSector
-			
+function RequestFighterSupport(CAPSector)	
+	if (trigger.misc.getUserFlag(5001) == 1) then	
+		if (trigger.misc.getUserFlag(5010) == 0) then			
+			local RouteNumber = CAPSector			
 			BLUECAP1 = SPAWN
-				:New( "RT BLUE CAP "..RouteNumber )
-				:InitLimit( 2, 2 )
-				:InitRandomizeTemplate( { "SQ BLUE CAP F-15C" } )
+				:New("RT BLUE CAP "..RouteNumber)
+				:InitLimit(2, 2)
+				:InitRandomizeTemplate({"SQ BLUE CAP F-15C"})
 				:OnSpawnGroup(
-					function( SpawnGroup )								
+					function(SpawnGroup)								
 						RTBLUECAPGROUPNAME = SpawnGroup.GroupName
 						RTBLUECAPGROUPID = Group.getByName(RTBLUECAPGROUPNAME):getID()												
 					end
 				)				
 				:Spawn()
 			
-			trigger.action.outText("Fighter Screen Launched",60)
-			--Set flag 5010 to 1
-			trigger.action.setUserFlag(5010,1)	
-			
-		elseif ( trigger.misc.getUserFlag(5010) == 1) then
-			--Check if the spawned Fighter Screen group is still alive or not
-						
-			if ( BLUECAP1:IsAlive() ) then
-				trigger.action.outText("Fighter Screen Is Currently Active, Further Support Is Unavailable",60)
+			trigger.action.outText("Fighter Screen Launched", 60)
+			trigger.action.setUserFlag(5010, 1)			
+		elseif (trigger.misc.getUserFlag(5010) == 1) then						
+			if (BLUECAP1:IsAlive()) then
+				trigger.action.outText("Fighter Screen Is Currently Active, Further Support Is Unavailable", 60)
 			else
-				trigger.action.setUserFlag(5010,0)
+				trigger.action.setUserFlag(5010, 0)
 				RequestFighterSupport(CAPSector)
 			end			
 		else			
@@ -1533,14 +1403,10 @@ function RequestFighterSupport(CAPSector)
 end
 
 function AbortCAPMission()
-
 	if (trigger.misc.getUserFlag(5010) == 1 ) then
-		if ( GROUP:FindByName(RTBLUECAPGROUPNAME):IsAlive() ) then
-			--If Alive, Perform RTB command
+		if (GROUP:FindByName(RTBLUECAPGROUPNAME):IsAlive()) then
 			local RTB = {}
-			--RTB.fromWaypointIndex = 2
-			RTB.goToWaypointIndex = 8
-								
+			RTB.goToWaypointIndex = 8								
 			local RTBTask = {id = 'SwitchWaypoint', params = RTB}
 			Group.getByName(RTBLUECAPGROUPNAME):getController():setOption(0, 3)
 			Group.getByName(RTBLUECAPGROUPNAME):getController():setCommand(RTBTask)	
@@ -1556,35 +1422,28 @@ end
 
 --////CLOSE AIR SUPPORT
 function RequestCASSupport(CASSector)
-
-	if ( trigger.misc.getUserFlag(5002) == 1 ) then
-		if ( trigger.misc.getUserFlag(5020) == 0 ) then
-
-			local RouteNumber = CASSector
-			
+	if (trigger.misc.getUserFlag(5002) == 1) then
+		if (trigger.misc.getUserFlag(5020) == 0) then
+			local RouteNumber = CASSector			
 			BLUECAS1 = SPAWN
-				:New( "RT BLUE CAS "..RouteNumber )
-				:InitLimit( 2, 2 )
-				:InitRandomizeTemplate( { "SQ BLUE CAS A-10C" } )
+				:New("RT BLUE CAS "..RouteNumber)
+				:InitLimit(2, 2)
+				:InitRandomizeTemplate({"SQ BLUE CAS A-10C"})
 				:OnSpawnGroup(
-					function( SpawnGroup )								
+					function(SpawnGroup)								
 						RTBLUECASGROUPNAME = SpawnGroup.GroupName
 						RTBLUECASGROUPID = Group.getByName(RTBLUECASGROUPNAME):getID()												
 					end
 				)
-				:Spawn()
+				:Spawn()			
+			trigger.action.outText("Close Air Support Launched", 60)
+			trigger.action.setUserFlag(5020, 1)	
 			
-			trigger.action.outText("Close Air Support Launched",60)
-			--Set flag 5020 to 1
-			trigger.action.setUserFlag(5020,1)	
-			
-		elseif ( trigger.misc.getUserFlag(5020) == 1) then
-			--Check if the spawned Close Air Support group is still alive or not
-			
-			if ( BLUECAS1:IsAlive() ) then
-				trigger.action.outText("Close Air Support Is Currently Active, Further Support Is Unavailable",60)
+		elseif (trigger.misc.getUserFlag(5020) == 1) then			
+			if (BLUECAS1:IsAlive()) then
+				trigger.action.outText("Close Air Support Is Currently Active, Further Support Is Unavailable", 60)
 			else				
-				trigger.action.setUserFlag(5020,0)
+				trigger.action.setUserFlag(5020, 0)
 				RequestCASSupport(CASSector)
 			end		
 		else			
@@ -1595,58 +1454,46 @@ function RequestCASSupport(CASSector)
 end
 
 function AbortCASMission()
-
-	if ( trigger.misc.getUserFlag(5020) == 1 ) then
-		if ( GROUP:FindByName(RTBLUECASGROUPNAME):IsAlive() ) then
-			--If Alive, Perform RTB command
+	if (trigger.misc.getUserFlag(5020) == 1) then
+		if (GROUP:FindByName(RTBLUECASGROUPNAME):IsAlive()) then
 			local RTB = {}
-			--RTB.fromWaypointIndex = 2
 			RTB.goToWaypointIndex = 7
-								
-			local RTBTask = {id = 'SwitchWaypoint', params = RTB}			
+			local RTBTask = {id = 'SwitchWaypoint', params = RTB}
 			Group.getByName(RTBLUECASGROUPNAME):getController():setOption(0, 3) -- (0, 4) is weapons hold, (0, 3) is return fire
-			Group.getByName(RTBLUECASGROUPNAME):getController():setCommand(RTBTask)	
-			
-			trigger.action.outText("Close Air Support Is Returning To Base",60)
+			Group.getByName(RTBLUECASGROUPNAME):getController():setCommand(RTBTask)			
+			trigger.action.outText("Close Air Support Is Returning To Base", 60)
 		else
-			trigger.action.outText("Close Air Support Does Not Have Planes To Recall",60)
+			trigger.action.outText("Close Air Support Does Not Have Planes To Recall", 60)
 		end
 	else
-		trigger.action.outText("Close Air Support Has Not Been Deployed",60)
+		trigger.action.outText("Close Air Support Has Not Been Deployed", 60)
 	end
 end
 
 --////ANTI-SHIPPING
-function RequestASSSupport(ASSSector)
-	
-	if ( trigger.misc.getUserFlag(5003) == 1 ) then	
-		if ( trigger.misc.getUserFlag(5030) == 0 ) then
-			
-			local RouteNumber = ASSSector
-			
+function RequestASSSupport(ASSSector)	
+	if (trigger.misc.getUserFlag(5003) == 1) then	
+		if (trigger.misc.getUserFlag(5030) == 0) then			
+			local RouteNumber = ASSSector			
 			BLUEASS1 = SPAWN
-				:New( "RT BLUE ASS "..RouteNumber )
-				:InitLimit( 2, 2 )
-				:InitRandomizeTemplate( { "SQ BLUE ASS AJS37" } ) --"SQ BLUE ASS AJS37", "SQ BLUE ASS F/A-18C"
+				:New("RT BLUE ASS "..RouteNumber)
+				:InitLimit(2, 2)
+				:InitRandomizeTemplate({"SQ BLUE ASS AJS37"}) --"SQ BLUE ASS AJS37", "SQ BLUE ASS F/A-18C"
 				:OnSpawnGroup(
-					function( SpawnGroup )								
+					function(SpawnGroup)								
 						RTBLUEASSGROUPNAME = SpawnGroup.GroupName
 						RTBLUEASSGROUPID = Group.getByName(RTBLUEASSGROUPNAME):getID()												
 					end
 				)
-				:Spawn()					
+				:Spawn()
+			trigger.action.outText("Anti-Shipping Strike Launched", 60)
+			trigger.action.setUserFlag(5030, 1)		
 			
-			trigger.action.outText("Anti-Shipping Strike Launched",60)
-			--Set flag 5030 to 1
-			trigger.action.setUserFlag(5030,1)		
-			
-		elseif ( trigger.misc.getUserFlag(5030) == 1) then
-			--Check if the spawned Anti-Shipping group is still alive or not
-			
-			if ( BLUEASS1:IsAlive() ) then
+		elseif (trigger.misc.getUserFlag(5030) == 1) then			
+			if (BLUEASS1:IsAlive()) then
 				trigger.action.outText("Anti-Shipping Is Currently Active, Further Support Is Unavailable",60)
 			else
-				trigger.action.setUserFlag(5030,0)
+				trigger.action.setUserFlag(5030, 0)
 				RequestASSSupport(ASSSector)
 			end		
 		else			
