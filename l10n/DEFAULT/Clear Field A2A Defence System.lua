@@ -346,7 +346,6 @@ function SEF_AIRFIELDPERIMETERZONES()
 	SochiPerimeterZone 			= ZONE:New("Sochi Perimeter")
 	NalchikPerimeterZone 		= ZONE:New("Nalchik Perimeter")
 	BeslanPerimeterZone 		= ZONE:New("Beslan Perimeter")
-	ServerWide 					= ZONE:New("Server Perimeter")
 end
 
 function SEF_AIRFIELDPERIMETERCLIENTS()
@@ -426,9 +425,14 @@ function GetServerPlayerCount()
 end
 
 function UpdateA2ASettings(Timeloop, time)
-	local playerCount = GetServerPlayerCount()
+	local playerCount = nil
+	if(GameMode == 0) then
+		playerCount = GetServerPlayerCount()
+	else
+		playerCount = 1
+	end	
 	
-	if(playerCount ~= false) then
+	if(playerCount ~= false and playerCount ~= nil) then
 		if(playerCount >= 5) then
 			if(currentActivity ~= "High") then
 				REDA2ADispatcher:SetSquadronGrouping("Gamma", 2)
@@ -446,7 +450,7 @@ function UpdateA2ASettings(Timeloop, time)
 				
 				currentActivity = "High"
 			end
-		else
+		elseif(playerCount <= 4) then
 			if(currentActivity ~= "Low") then
 				REDA2ADispatcher:SetSquadronGrouping("Alpha", 2)
 				REDA2ADispatcher:SetSquadronGrouping("Beta", 2)
@@ -489,7 +493,7 @@ timer.scheduleFunction(SEF_BLUEDEFENCENETWORK, 53, timer.getTime() + 2)
 timer.scheduleFunction(SEF_REDDEFENCENETWORK, 53, timer.getTime() + 3)
 --////Airfield Perimeter scanner	
 timer.scheduleFunction(SEF_AIRFIELDPERIMETERZONECLIENTSCANNER, 53, timer.getTime() + 21)
-timer.scheduleFunction(UpdateA2ASettings, 1337, timer.getTime() + 30)
+timer.scheduleFunction(UpdateA2ASettings, 53, timer.getTime() + 30)
 
 --SEF_CleanUpAirports()
 
