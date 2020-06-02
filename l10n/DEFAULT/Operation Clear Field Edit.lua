@@ -1092,7 +1092,7 @@ function SEF_TargetSmokeLock(TaskNumber)
 	TargetSmokeLockout[TaskNumber] = 1
 end
 
-function SEF_Target1SmokeUnlock(TaskNumber)
+function SEF_TargetSmokeUnlock(TaskNumber)
 	TargetSmokeLockout[TaskNumber] = 0
 end
 
@@ -1116,8 +1116,8 @@ function SEF_TargetSmoke(TaskNumber)
 				SEFTargetSmokeGroupCoord = GROUP:FindByName(Target):GetCoordinate()
 				SEFTargetSmokeGroupCoord:FlareRed()
 				trigger.action.outText("Objective "..objectiveID.." Has Been Marked With Red Flare", 15)
-				SEF_Target1SmokeLock()
-				timer.scheduleFunction(SEF_Target1SmokeUnlock, TaskNumber, timer.getTime() + 300)				
+				SEF_TargetSmokeLock(TaskNumber)
+				timer.scheduleFunction(SEF_TargetSmokeUnlock, TaskNumber, timer.getTime() + 300)				
 			else			
 				trigger.action.outText("Target Flares Currently Unavailable - Unable To Acquire Target Group", 15)						
 			end		
@@ -1126,8 +1126,8 @@ function SEF_TargetSmoke(TaskNumber)
 				SEFTargetSmokeStaticCoord = STATIC:FindByName(Target):GetCoordinate()
 				SEFTargetSmokeStaticCoord:FlareRed()
 				trigger.action.outText("Objective "..objectiveID.." Has Been Marked With Red Flare", 15)
-				SEF_Target1SmokeLock()
-				timer.scheduleFunction(SEF_Target1SmokeUnlock, TaskNumber, timer.getTime() + 300)				
+				SEF_TargetSmokeLock(TaskNumber)
+				timer.scheduleFunction(SEF_TargetSmokeUnlock, TaskNumber, timer.getTime() + 300)				
 			else
 				trigger.action.outText("Target Flare Currently Unavailable - Unable To Acquire Target Building", 15)	
 			end			
@@ -1167,9 +1167,9 @@ trigger.action.setUserFlag(5006,1)
 
 --////FUNCTIONS
 SEF_InitializeMissionTable()		
-SEF_Target1SmokeUnlock(1)
-SEF_Target1SmokeUnlock(2)
-SEF_Target1SmokeUnlock(3)
+SEF_TargetSmokeUnlock(1)
+SEF_TargetSmokeUnlock(2)
+SEF_TargetSmokeUnlock(3)
 SEF_MissionSelector(1)
 SEF_MissionSelector(2)
 SEF_MissionSelector(3)
