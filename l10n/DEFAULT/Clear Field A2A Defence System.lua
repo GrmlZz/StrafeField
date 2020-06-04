@@ -409,6 +409,7 @@ function SEF_AIRFIELDPERIMETERZONECLIENTSCANNER(Timeloop, time)
 end
 
 -- Strafe Haven Edits
+GameMode = trigger.misc.getUserFlag(10000)	
 local currentActivity = ""
 
 function GetServerPlayerCount()
@@ -476,8 +477,6 @@ function UpdateA2ASettings(Timeloop, time)
 	return time + 30
 end
 ----------------------------------------------------------------------------------------------------------------------------------------------	
-GameMode = trigger.misc.getUserFlag(10000)	
-
 SEF_REDDISPATCHERON()
 if (GameMode == 0) then
 	SEF_REDSQUADRONSMULTIPLAYER()
