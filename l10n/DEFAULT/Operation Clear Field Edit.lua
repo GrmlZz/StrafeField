@@ -419,9 +419,8 @@ function TargetReport(PlayerGroup, TaskNumber)
 		CoordStringLLDDM = TargetCoord:ToStringLLDDM(SETTINGS:SetImperial())
 		_SETTINGS:SetLL_Accuracy(2)
 		CoordStringLLDMSDS = TargetCoord:ToStringLLDMSDS(SETTINGS:SetImperial())
-		
-		trigger.action.outText(tostring(PlaneType), 10)
 
+		trigger.action.outTextForGroup(ClientGroupID, "Target Report for "..(TaskNumber == 1 and "Objective Alpha" or TaskNumber == 2 and "Objective Bravo" or TaskNumber == 3 and "Objective Charlie"), 40)
 		if (PlaneType == "F-16C_50") then
 			trigger.action.outTextForGroup(ClientGroupID, Briefing.."\n"..SZMessage.."\n".."\n"..CoordStringLLDDM.."\n".."\n"..ELEMessage..BRMessage.."\n".."\nPilots Assigned:\n"..PlayersAssigned, 40)
 		elseif (PlaneType == "F/A-18C_hornet") then
