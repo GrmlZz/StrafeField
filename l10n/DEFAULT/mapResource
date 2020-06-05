@@ -2,10 +2,10 @@ mapResource =
 {
     ["ResKey_Action_2054"] = "Clear Field Carrier Edit.lua",
     ["ResKey_Action_49"] = "Moose Surrexen Doom Eternal Version.lua",
-    ["ResKey_Action_764"] = "Background Chatter.ogg",
+    ["ResKey_Action_765"] = "That Is Our Target.ogg",
     ["ResKey_Action_51"] = "Clear Field A2A Defence System.lua",
     ["ResKey_Action_323"] = "Operation Clear Field Edit.lua",
-    ["ResKey_Action_765"] = "That Is Our Target.ogg",
-    ["ResKey_Action_200"] = "Clear Field Deathwatch.lua",
     ["ResKey_Action_2055"] = "Clear Field Persistent World.lua",
+    ["ResKey_Action_200"] = "Clear Field Deathwatch.lua",
+    ["ResKey_Action_764"] = "Background Chatter.ogg",
 } -- end of mapResource
