@@ -12,7 +12,7 @@ options =
         ["f10_awacs"] = true,
         ["Coordinate_Display"] = "Lat Long",
         ["accidental_failures"] = false,
-        ["autologin"] = false,
+        ["autologin"] = true,
         ["force_feedback_enabled"] = true,
         ["collect_stat"] = false,
         ["chat_window_at_start"] = true,
@@ -135,8 +135,9 @@ options =
         }, -- end of ["CaptoGlove"]
         ["DCS-SRS"] = 
         {
-            ["srsAutoLaunchEnabled"] = true,
             ["srsOverlayEnabled"] = true,
+            ["srsAutoLaunchEnabled"] = true,
+            ["srsOverlayCompactModeEnabled"] = false,
         }, -- end of ["DCS-SRS"]
         ["TF-51D"] = 
         {

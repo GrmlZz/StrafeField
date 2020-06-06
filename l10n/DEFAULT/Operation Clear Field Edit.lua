@@ -338,18 +338,31 @@ function SEF_InitializeMissionTable()
 end
 
 local function CheckObjectiveRequest(PlayerGroup)	
-	grpID = PlayerGroup:getID()
+	local grpID = PlayerGroup:getID()
+	local PlayerUnit = UNIT:FindByName(PlayerGroup:getUnit(1):getName())
+	local PlayerCoord = PlayerUnit:GetCoordinate()	
 
-	if (A2G_Task[1]:GetMission().Briefing ~= nil ) then
-		trigger.action.outTextForGroup(grpID, A2G_Task[1]:GetMission().Briefing.."\nAssigned Pilots\n"..A2G_Task[1]:GetPilots(), 15)
-	end
+	local TaskNumber = 1
 
-	if (A2G_Task[2]:GetMission().Briefing ~= nil ) then
-		trigger.action.outTextForGroup(grpID, A2G_Task[2]:GetMission().Briefing.."\nAssigned Pilots\n"..A2G_Task[2]:GetPilots(), 15)
-	end
 	
-	if (A2G_Task[3]:GetMission().Briefing ~= nil ) then
-		trigger.action.outTextForGroup(grpID, A2G_Task[3]:GetMission().Briefing.."\nAssigned Pilots\n"..A2G_Task[3]:GetPilots(), 15)
+	while A2G_Task[TaskNumber]:GetMission().Briefing ~= nil do
+
+		local isStatic	= A2G_Task[TaskNumber]:GetMission().Static
+		local Target	= A2G_Task[TaskNumber]:GetMission().Target
+		local Briefing	= A2G_Task[TaskNumber]:GetMission().Briefing
+		local Pilots	= A2G_Task[TaskNumber]:GetPilots()
+				
+		if  (isStatic == false) then
+			TargetGroup = GROUP:FindByName(Target)	
+		else
+			TargetGroup = STATIC:FindByName(Target, false)
+		end
+		TargetCoord = TargetGroup:GetCoordinate()
+		PlayerDistance = PlayerCoord:Get2DDistance(TargetCoord)
+		PlayerBR = PlayerCoord:GetDistanceText(PlayerDistance, SETTINGS:SetImperial())
+		trigger.action.outTextForGroup(grpID, (TaskNumber == 1 and "Objective Alpha\n" or TaskNumber == 2 and "Objective Bravo\n" or TaskNumber == 3 and "Objective Charlie\n")..Briefing.." - "..PlayerBR.."\nAssigned Pilots\n", 15)
+
+		TaskNumber = TaskNumber + 1
 	end
 
 	if ( OperationComplete == true ) then
@@ -419,6 +432,7 @@ function TargetReport(PlayerGroup, TaskNumber)
 		CoordStringLLDDM = TargetCoord:ToStringLLDDM(SETTINGS:SetImperial())
 		_SETTINGS:SetLL_Accuracy(2)
 		CoordStringLLDMSDS = TargetCoord:ToStringLLDMSDS(SETTINGS:SetImperial())
+
 
 		trigger.action.outTextForGroup(ClientGroupID, "Target Report for "..(TaskNumber == 1 and "Objective Alpha" or TaskNumber == 2 and "Objective Bravo" or TaskNumber == 3 and "Objective Charlie"), 40)
 		if (PlaneType == "F-16C_50") then
